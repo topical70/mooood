@@ -1,6 +1,3 @@
-// Paste your Google Sheets Web App URL here:
-const GOOGLE_SHEETS_WEB_APP_URL = 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE';
-
 const form = document.getElementById('moodForm');
 const suggestionBox = document.getElementById('suggestionBox');
 const exportBtn = document.getElementById('exportBtn');
@@ -24,22 +21,6 @@ let moodData = JSON.parse(localStorage.getItem('moodData')) || [];
 function saveMood(date, mood) {
   moodData.push({ date, mood });
   localStorage.setItem('moodData', JSON.stringify(moodData));
-}
-
-function sendMoodToGoogleSheets(date, mood) {
-  if (!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL === 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE') {
-    console.warn('Google Sheets Web App URL not set. Data won’t be sent to the sheet.');
-    return;
-  }
-
-  fetch(GOOGLE_SHEETS_WEB_APP_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date, mood, userAgent: navigator.userAgent })
-  })
-  .then(res => res.text())
-  .then(data => console.log('Data sent to Google Sheets:', data))
-  .catch(err => console.error('Error sending to Google Sheets:', err));
 }
 
 function showSuggestion(mood) {
@@ -136,7 +117,6 @@ form.addEventListener('submit', (e) => {
   }
 
   saveMood(date, mood);
-  sendMoodToGoogleSheets(date, mood);
   showSuggestion(mood);
   updateChart();
 
