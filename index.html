@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mood Tracker App</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Mood Tracker</h1>
+
+    <form id="moodForm">
+      <label for="date">Date:</label>
+      <input type="date" id="date" required />
+
+      <label for="mood">Mood:</label>
+      <select id="mood" required>
+        <option value="">Select Mood</option>
+        <option value="Happy">Happy</option>
+        <option value="Sad">Sad</option>
+        <option value="Angry">Angry</option>
+      </select>
+
+      <button type="submit">Log Mood</button>
+    </form>
+
+    <button onclick="exportToCSV()">📄 Export Data as CSV</button>
+
+    <canvas id="moodChart" width="400" height="200"></canvas>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
