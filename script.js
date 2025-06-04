@@ -1,10 +1,21 @@
 const moodForm = document.getElementById('moodForm');
 const dateInput = document.getElementById('date');
 const moodInput = document.getElementById('mood');
+const suggestionBox = document.getElementById('suggestionBox');
 const moodChartCanvas = document.getElementById('moodChart');
 
 // Load from Local Storage
 let moodData = JSON.parse(localStorage.getItem('moodData')) || {};
+
+function showSuggestion(mood) {
+  const suggestions = {
+    Happy: "Keep spreading your happiness! 😄",
+    Sad: "Try taking a walk or listening to your favorite music. 🌈",
+    Angry: "Deep breaths. Maybe write down what upset you. 🧘"
+  };
+  suggestionBox.textContent = suggestions[mood] || "Log your mood to get a tip.";
+  suggestionBox.classList.add("visible");
+}
 
 moodForm.addEventListener('submit', function(event) {
   event.preventDefault();
@@ -14,23 +25,24 @@ moodForm.addEventListener('submit', function(event) {
   if (date && mood) {
     moodData[date] = mood;
     localStorage.setItem('moodData', JSON.stringify(moodData));
+    showSuggestion(mood);
     updateChart();
     moodForm.reset();
   }
 });
 
-function countMoodsByDate(data) {
+function countMoods(data) {
   const moodTypes = ['Happy', 'Sad', 'Angry'];
   const dates = Object.keys(data).sort();
-  const moodCounts = moodTypes.map(mood => 
+  const counts = moodTypes.map(mood =>
     dates.map(date => data[date] === mood ? 1 : 0)
   );
 
-  return { dates, moodCounts, moodTypes };
+  return { dates, counts, moodTypes };
 }
 
 function updateChart() {
-  const { dates, moodCounts, moodTypes } = countMoodsByDate(moodData);
+  const { dates, counts, moodTypes } = countMoods(moodData);
 
   if (window.moodChart) {
     window.moodChart.destroy();
@@ -42,16 +54,19 @@ function updateChart() {
       labels: dates,
       datasets: moodTypes.map((mood, index) => ({
         label: mood,
-        data: moodCounts[index],
+        data: counts[index],
         backgroundColor: ['#4caf50', '#f44336', '#ff9800'][index]
       }))
     },
     options: {
       responsive: true,
+      animation: {
+        duration: 1000
+      },
       plugins: {
         title: {
           display: true,
-          text: 'Mood Tracker Graph'
+          text: 'Mood Trends Over Time'
         }
       }
     }
@@ -78,5 +93,5 @@ function exportToCSV() {
   document.body.removeChild(link);
 }
 
-// Load chart when page loads
+// Load chart on page load
 updateChart();
