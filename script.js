@@ -1,4 +1,4 @@
-// Replace this with your Google Apps Script Web App URL from Step 2 of Google Sheets setup
+// Paste your Google Sheets Web App URL here:
 const GOOGLE_SHEETS_WEB_APP_URL = 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE';
 
 const form = document.getElementById('moodForm');
@@ -27,14 +27,15 @@ function saveMood(date, mood) {
 }
 
 function sendMoodToGoogleSheets(date, mood) {
+  if (!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL === 'YOUR_GOOGLE_SHEETS_WEB_APP_URL_HERE') {
+    console.warn('Google Sheets Web App URL not set. Data won’t be sent to the sheet.');
+    return;
+  }
+
   fetch(GOOGLE_SHEETS_WEB_APP_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      date,
-      mood,
-      userAgent: navigator.userAgent
-    })
+    body: JSON.stringify({ date, mood, userAgent: navigator.userAgent })
   })
   .then(res => res.text())
   .then(data => console.log('Data sent to Google Sheets:', data))
@@ -46,12 +47,9 @@ function showSuggestion(mood) {
 }
 
 function countMoods(data) {
-  // We want to show counts of each mood per day
-  // Create a sorted list of dates
   const datesSet = new Set(data.map(d => d.date));
   const dates = Array.from(datesSet).sort();
 
-  // For each mood, create an array of counts per date
   const counts = moodTypes.map(() => Array(dates.length).fill(0));
 
   data.forEach(({ date, mood }) => {
@@ -143,6 +141,7 @@ form.addEventListener('submit', (e) => {
   updateChart();
 
   form.reset();
+  form.date.value = new Date().toISOString().slice(0, 10); // Reset date to today
 });
 
 exportBtn.addEventListener('click', exportToCSV);
@@ -150,9 +149,8 @@ exportBtn.addEventListener('click', exportToCSV);
 // Initialize date input to today
 form.date.value = new Date().toISOString().slice(0, 10);
 
-// Load existing data and render chart & suggestions
+// Load existing data and render chart & suggestion if any
 if (moodData.length > 0) {
   updateChart();
-  // Show last logged mood suggestion if any
   showSuggestion(moodData[moodData.length - 1].mood);
 }
